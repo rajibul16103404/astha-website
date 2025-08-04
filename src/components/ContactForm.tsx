@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+const baseUrl = import.meta.env.VITE_API_URL;
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -30,22 +31,58 @@ const ContactForm = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      toast.success('Thank you for your message! We will get back to you soon.');
-      setFormData({
-        name: '',
-        email: '',
-        projectType: '',
-        message: ''
+    try {
+      const response = await fetch(`${baseUrl}/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          project_type: formData.projectType,
+          description: formData.message,
+        }),
       });
-      setLoading(false);
-    }, 1000);
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        toast.error(result.message || 'Something went wrong.');
+      } else {
+        setTimeout(() => {
+          toast.success(`Thank you ${result.data.name} for your message! We will get back to you soon.`);
+          setFormData({
+            name: '',
+            email: '',
+            projectType: '',
+            message: ''
+          });
+          setLoading(false); // ✅ Move this here
+        }, 1000);
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again later.');
+      setLoading(false); // ✅ keep this only for catch block
+    }
   };
+  
+    
+    // // Simulate form submission
+    // setTimeout(() => {
+    //   toast.success('Thank you for your message! We will get back to you soon.');
+    //   setFormData({
+    //     name: '',
+    //     email: '',
+    //     projectType: '',
+    //     message: ''
+    //   });
+    //   setLoading(false);
+    // }, 1000);
+  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
