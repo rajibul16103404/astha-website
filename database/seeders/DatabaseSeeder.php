@@ -27,5 +27,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin1234@sharklasers.com',
             'password' => Hash::make('123456'),
         ]);
+
+        $this->call([
+            ServiceSeeder::class,
+            ServiceDetailSeeder::class,
+        ]);
+
     }
 }
