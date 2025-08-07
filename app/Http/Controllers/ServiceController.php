@@ -17,11 +17,6 @@ class ServiceController extends Controller
     }
     public function create()
     {
-        //
-    }
-
-    public function store(Request $request)
-    {
         $request->validate([
             'service_name' => 'required|string|max:255',
             'service_description' => 'nullable|string',
@@ -38,6 +33,11 @@ class ServiceController extends Controller
         }
         $service = Service::create($data);
         return response()->json($service, 201);
+    }
+
+    public function store(Request $request)
+    {
+        
     }
 
     public function show(Service $service)
