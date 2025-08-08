@@ -1,89 +1,88 @@
+import { useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import {
+  BsArrowLeftSquareFill,
+  BsArrowRightSquareFill,
+  BsSpeedometer2,
+  BsBoxSeam,
+  BsBarChart,
+  BsBoxArrowRight,
+} from "react-icons/bs";
+import { MdOutlineMiscellaneousServices } from "react-icons/md";
 
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+const AdminHeader = () => {
+  const [isOpen, setIsOpen] = useState(true);
+  const location = useLocation();
 
-const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  const menuItems = [
+    { label: "Dashboard", icon: <BsSpeedometer2 />, path: "/admin/dashboard" },
+    { label: "Services", icon: <MdOutlineMiscellaneousServices />, path: "/admin/services" },
+    { label: "Services Details", icon: <MdOutlineMiscellaneousServices />, path: "/admin/services-details" },
+    { label: "Products", icon: <BsBoxSeam />, path: "/admin/products" },
+    { label: "Reports", icon: <BsBarChart />, path: "/admin/reports" },
+    { label: "Logout", icon: <BsBoxArrowRight />, path: "/admin/logout" },
+  ];
 
   return (
-    <header
-      className={cn(
-        'fixed w-full z-50 transition-all duration-300',
-        isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
-      )}
-    >
-      <div className="container mx-auto flex items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <img src="/lovable-uploads/0c304457-f71b-4d2c-be41-05d9307c31a8.png" alt="Astha Insight Logo" className="h-20 w-40 object-cover" />
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-secondary font-medium hover:text-primary transition-colors">Home</Link>
-          <Link to="/services" className="text-secondary font-medium hover:text-primary transition-colors">Services</Link>
-          <Link to="/products" className="text-secondary font-medium hover:text-primary transition-colors">Products</Link>
-          <Link to="/team" className="text-secondary font-medium hover:text-primary transition-colors">Team</Link>
-          <Link to="/testimonials" className="text-secondary font-medium hover:text-primary transition-colors">Case Studies</Link>
-          <Link to="/contact" className="text-secondary font-medium hover:text-primary transition-colors">Contact</Link>
-        </nav>
-
-        <div className="hidden md:block">
-          <Button asChild>
-            <Link to="/contact" className="bg-primary hover:bg-primary/90 text-white px-6">
-              Get a Free Consultation
-            </Link>
-          </Button>
-        </div>
-
-        {/* Mobile menu button */}
-        <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6 text-secondary" />
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <div
+        className={`
+          ${isOpen ? "w-64" : "w-20"} 
+          bg-primary text-white p-4 
+          flex flex-col 
+          sticky top-0 h-screen 
+          transition-all duration-300
+        `}
+      >
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="mb-6 focus:outline-none"
+        >
+          {isOpen ? (
+            <BsArrowLeftSquareFill className="text-3xl" />
           ) : (
-            <Menu className="h-6 w-6 text-secondary" />
+            <BsArrowRightSquareFill className="text-3xl" />
           )}
         </button>
+
+        <div className="flex justify-center mb-10">
+          <img
+            src="/lovable-uploads/0c304457-f71b-4d2c-be41-05d9307c31a81.png"
+            alt="logo"
+            className="bg-white rounded-full p-2"
+          />
+        </div>
+
+        <ul className="space-y-2 flex-1 overflow-auto">
+          {menuItems.map(({ label, icon, path }) => {
+            const isActive = location.pathname === path;
+            return (
+              <li key={path} className="rounded cursor-pointer">
+                <Link
+                  to={path}
+                  className={`flex items-center gap-3 p-3 rounded transition-all duration-200
+                    ${
+                      isActive
+                        ? "border border-white bg-primary text-white"
+                        : "hover:bg-white hover:text-primary hover:border hover:border-primary"
+                    }`}
+                >
+                  <span className="text-xl">{icon}</span>
+                  {isOpen && <span className="text-base">{label}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white">
-          <div className="flex flex-col space-y-4 px-4 py-6">
-            <Link to="/" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link to="/services" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Services</Link>
-            <Link to="/products" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Products</Link>
-            <Link to="/team" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Team</Link>
-            <Link to="/testimonials" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Case Studies</Link>
-            <Link to="/contact" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-            <Button asChild className="w-full">
-              <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
-                Get a Free Consultation
-              </Link>
-            </Button>
-          </div>
-        </div>
-      )}
-    </header>
+      {/* Main content */}
+      <div className="flex-1 p-6 overflow-auto">
+        <Outlet />
+      </div>
+    </div>
   );
 };
 
-export default Header;
+export default AdminHeader;

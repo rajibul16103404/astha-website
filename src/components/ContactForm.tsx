@@ -130,7 +130,7 @@ const ContactForm = () => {
           value={formData.message}
           onChange={handleChange}
           placeholder="Tell us about your project..."
-          className="bg-white min-h-[120px]"
+          className="bg-white min-h-[120px] text-secondary"
           required
         />
       </div>

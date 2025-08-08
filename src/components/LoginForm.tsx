@@ -44,12 +44,12 @@ const LoginForm = () => {
       }
 
       // Save token
-      localStorage.setItem('access_token', data.token);
+      localStorage.setItem('access_token', data.accessToken);
 
       toast.success(`Welcome, ${data.username}! Redirecting...`);
       // Redirect user
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/admin/dashboard';
       }, 2000);
 
     } catch (err) {

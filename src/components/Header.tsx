@@ -1,28 +1,102 @@
-
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+  const sections = ['hero', 'about', 'service', 'products', 'quote', 'testimonials', 'contact'];
+
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      setIsScrolled(window.scrollY > 10);
+
+      const scrollY = window.scrollY + window.innerHeight / 2;
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const { offsetTop, offsetHeight } = el;
+          if (scrollY >= offsetTop && scrollY < offsetTop + offsetHeight) {
+            setActiveSection(id);
+            break;
+          }
+        }
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    handleScroll(); // run on mount
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close dropdown if clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        pagesDropdownOpen &&
+        dropdownRef.current &&
+        toggleButtonRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !toggleButtonRef.current.contains(event.target as Node)
+      ) {
+        setPagesDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [pagesDropdownOpen]);
+
+  const navItems = [
+    { name: 'Home', href: '#hero' },
+    { name: 'About', href: '#about' },
+    { name: 'Services', href: '#service' },
+    { name: 'Products', href: '#products' },
+    { name: 'Quote', href: '#quote' },
+    { name: 'Testimonials', href: '#testimonials' },
+    { name: 'Contact', href: '#contact' },
+  ];
+
+  const renderLink = (item: any) => {
+    const sectionId = item.href.replace('#', '');
+    const isActive = activeSection === sectionId;
+
+    return (
+      <button
+        key={item.name}
+        onClick={() => {
+          setMobileMenuOpen(false);
+          if (location.pathname !== '/') {
+            sessionStorage.setItem('scrollToSection', sectionId);
+            navigate('/');
+          } else {
+            const el = document.getElementById(sectionId);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        }}
+        className={cn(
+          'text-secondary font-medium transition-colors',
+          isActive && 'text-primary font-semibold'
+        )}
+      >
+        {item.name}
+      </button>
+    );
+  };
 
   return (
     <header
@@ -32,30 +106,84 @@ const Header = () => {
       )}
     >
       <div className="container mx-auto flex items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <img src="/lovable-uploads/0c304457-f71b-4d2c-be41-05d9307c31a8.png" alt="Astha Insight Logo" className="h-20 w-40 object-cover" />
-        </Link>
+        <a href="/" className="flex items-center space-x-2">
+          <img
+            src="/lovable-uploads/0c304457-f71b-4d2c-be41-05d9307c31a8.png"
+            alt="Astha Insight Logo"
+            className="h-20 w-40 object-cover"
+          />
+        </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-secondary font-medium hover:text-primary transition-colors">Home</Link>
-          <Link to="/services" className="text-secondary font-medium hover:text-primary transition-colors">Services</Link>
-          <Link to="/products" className="text-secondary font-medium hover:text-primary transition-colors">Products</Link>
-          <Link to="/team" className="text-secondary font-medium hover:text-primary transition-colors">Team</Link>
-          <Link to="/testimonials" className="text-secondary font-medium hover:text-primary transition-colors">Case Studies</Link>
-          <Link to="/contact" className="text-secondary font-medium hover:text-primary transition-colors">Contact</Link>
+        <nav className="hidden md:flex items-center space-x-8 relative">
+          {navItems.map(renderLink)}
+
+          {/* Pages Dropdown */}
+          <div className="relative">
+            <button
+              ref={toggleButtonRef}
+              onClick={() => setPagesDropdownOpen(!pagesDropdownOpen)}
+              className="text-secondary font-medium transition-colors hover:text-primary"
+            >
+              Pages ▾
+            </button>
+
+            {pagesDropdownOpen && (
+              <div
+                ref={dropdownRef}
+                className="absolute mt-2 w-40 bg-white border border-gray-200 shadow-lg rounded-md z-50"
+              >
+                <a
+                  href="/services"
+                  className="block px-4 py-2 font-semibold text-md text-secondary hover:text-primary"
+                >
+                  Services
+                </a>
+                <a
+                  href="/products"
+                  className="block px-4 py-2 font-semibold text-md text-secondary hover:text-primary"
+                >
+                  Products
+                </a>
+                <a
+                  href="/team"
+                  className="block px-4 py-2 font-semibold text-md text-secondary hover:text-primary"
+                >
+                  Teams
+                </a>
+                <a
+                  href="/testimonials"
+                  className="block px-4 py-2 font-semibold text-md text-secondary hover:text-primary"
+                >
+                  Case Study
+                </a>
+                <a
+                  href="/contact"
+                  className="block px-4 py-2 font-semibold text-md text-secondary hover:text-primary"
+                >
+                  Contact
+                </a>
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="hidden md:block">
           <Button asChild>
-            <Link to="/contact" className="bg-primary hover:bg-primary/90 text-white px-6">
+            <a
+              href="#contact"
+              className="bg-primary hover:bg-primary/90 text-white px-6"
+            >
               Get a Free Consultation
-            </Link>
+            </a>
           </Button>
         </div>
 
-        {/* Mobile menu button */}
-        <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
           {mobileMenuOpen ? (
             <X className="h-6 w-6 text-secondary" />
           ) : (
@@ -64,20 +192,18 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white">
           <div className="flex flex-col space-y-4 px-4 py-6">
-            <Link to="/" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link to="/services" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Services</Link>
-            <Link to="/products" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Products</Link>
-            <Link to="/team" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Team</Link>
-            <Link to="/testimonials" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Case Studies</Link>
-            <Link to="/contact" className="text-secondary font-medium" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+            {navItems.map(renderLink)}
             <Button asChild className="w-full">
-              <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
+              <a
+                href="#contact"
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 Get a Free Consultation
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

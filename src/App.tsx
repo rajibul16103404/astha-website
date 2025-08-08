@@ -15,31 +15,60 @@ import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import LoginRegister from "./pages/LoginRegister";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminHeader from "./components/AdminHeader";
+import ServicesList from "./pages/ServicesList";
+import ServicesDetailsList from "./pages/ServicesDetailsList";
+import { useEffect } from "react";
+import ServicesDetails from "./pages/ServicesDetails";
+
 
 const queryClient = new QueryClient();
 
 const Layout = () => {
   const location = useLocation();
-  const hideHeaderFooter = location.pathname === "/admin";
+
+
+
+
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
     <>
       <ScrollToTop />
-      {!hideHeaderFooter && <Header />}
+      {/* Admin Header */}
+      {isAdminRoute}
+
+      {/* Default Header */}
+      {!isAdminRoute && <Header />}
+
       <main>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<LoginRegister />} />
+          <Route path="/login" element={<LoginRegister />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/details" element={<ServicesDetails />} />
           <Route path="/products" element={<Products />} />
           <Route path="/team" element={<Team />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminHeader />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="services" element={<ServicesList />} />
+            <Route path="services-details" element={<ServicesDetailsList />} />
+            {/* other nested admin routes */}
+        </Route>
+
         </Routes>
       </main>
-      {!hideHeaderFooter && <WhatsAppButton />}
-      {!hideHeaderFooter && <Footer />}
+
+      {/* WhatsApp button and footer only on non-admin pages */}
+      {!isAdminRoute && <WhatsAppButton />}
+      {!isAdminRoute && <Footer />}
     </>
   );
 };

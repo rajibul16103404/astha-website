@@ -1,6 +1,6 @@
 import { BsArrowLeftSquareFill } from "react-icons/bs";
 import AnimatedSection from '@/components/AnimatedSection';
-import LoginForm from "@/components/LogInForm";
+import LoginForm from "@/components/LoginForm";
 
 const LoginRegister = () => {
   return (

@@ -2,15 +2,119 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Code, Cpu, Database, Smartphone } from 'lucide-react';
+import { ArrowRight, Book, Brain, Check, Code, Cpu, Database, Quote, Smartphone } from 'lucide-react';
 import AnimatedSection from '@/components/AnimatedSection';
 import ContactForm from '@/components/ContactForm';
+import { useEffect, useRef, useState } from 'react';
+import { Slider } from "@/components/ui/slider";
+import TestimonialSliderWithRadix from '@/components/TestimonialSliderWithRadix ';
+import axios from 'axios';
+
+
+
 
 const Index = () => {
+
+  const [service, setService] = useState([]);
+  const [service2, setService2] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const API_URL = import.meta.env.VITE_API_URL;
+  const IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
+
+
+  useEffect(() => {
+    const sectionToScroll = sessionStorage.getItem("scrollToSection");
+    if (sectionToScroll) {
+      setTimeout(() => {
+        const element = document.getElementById(sectionToScroll);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+          sessionStorage.removeItem("scrollToSection");
+        }
+      }, 300);
+    }
+  }, []);
+
+
+
+
+
+  const testimonials = [
+  {
+    quote: "Astha Insight transformed our online presence...",
+    name: "Emily Carter",
+    title: "Marketing Director, TechNova",
+  },
+  {
+    quote: "Their team’s expertise and dedication were evident...",
+    name: "Michael Chen",
+    title: "Founder, GreenWave Solutions",
+  },
+  {
+    quote: "Our project was completed ahead of schedule...",
+    name: "Sara Mitchell",
+    title: "COO, BrightStart Education",
+  },
+  {
+    quote: "We saw a 300% increase in engagement thanks to Astha Insight.",
+    name: "Michael Chen",
+    title: "CEO, GreenWave",
+  },
+];
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [sliderValue, setSliderValue] = useState([0]);
+
+  const handleSliderChange = (value: number[]) => {
+    setSliderValue(value);
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    const scrollLeft = (value[0] / 100) * maxScroll;
+    scrollContainer.scrollTo({ left: scrollLeft, behavior: "smooth" });
+  };
+
+  // Optional: sync slider on manual scroll
+    useEffect(() => {
+      const scrollContainer = scrollRef.current;
+      if (!scrollContainer) return;
+
+      const handleScroll = () => {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        const scrollPercentage = (scrollContainer.scrollLeft / maxScroll) * 100;
+        setSliderValue([scrollPercentage]);
+      };
+
+      scrollContainer.addEventListener("scroll", handleScroll);
+      return () => scrollContainer.removeEventListener("scroll", handleScroll);
+    }, []);
+
+
+    useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/homepage`);
+        const data = response.data;
+        setService(data.service || []);
+        setService2(data.service2 || []);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, [API_URL]);
+
+    if (loading) return <div>Loading...</div>;
+
   return (
     <>
       {/* Hero Section with Animation */}
-      <section className="relative min-h-screen hero-gradient flex items-center pt-20">
+      <section className="relative min-h-screen hero-gradient flex items-center pt-20" id="hero">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 md:pr-8">
@@ -124,7 +228,7 @@ const Index = () => {
       </section>
 
       {/* Intro Section */}
-      <section className="py-20">
+      <section className="py-20 scroll-mt-24" id="about">
         <div className="container mx-auto px-4">
           <AnimatedSection>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">About Astha Insight</h2>
@@ -194,7 +298,7 @@ const Index = () => {
       </section>
 
       {/* Services Overview */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 scroll-mt-24" id="service">
         <div className="container mx-auto px-4">
           <AnimatedSection>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Our Services</h2>
@@ -204,19 +308,21 @@ const Index = () => {
             </p>
           </AnimatedSection>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {service.map(s => (
             <AnimatedSection delay={0.1} className="service-card bg-white rounded-lg shadow-lg p-6 text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Cpu className="h-8 w-8 text-primary" />
+              <div className="bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <img className="" src={`${IMAGE_URL}${s.service_image}`}/>
               </div>
-              <h3 className="text-xl font-semibold mb-4">AI Development</h3>
-              <p className="text-gray-600 mb-6">Custom AI solutions including machine learning models, computer vision, and natural language processing.</p>
-              <Link to="/services#ai" className="text-primary font-medium flex items-center justify-center hover:underline">
+              <h3 className="text-xl font-semibold mb-4">{s.service_name}</h3>
+              <p className="text-gray-600 mb-6">{s.service_description}</p>
+              <Link to="/services/details" className="text-primary font-medium flex items-center justify-center hover:underline">
                 Learn More <ArrowRight className="h-4 w-4 ml-1" />
               </Link>
             </AnimatedSection>
+            ))}
             
-            <AnimatedSection delay={0.2} className="service-card bg-white rounded-lg shadow-lg p-6 text-center">
+            {/* <AnimatedSection delay={0.2} className="service-card bg-white rounded-lg shadow-lg p-6 text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Code className="h-8 w-8 text-primary" />
               </div>
@@ -247,8 +353,9 @@ const Index = () => {
               <Link to="/services#blockchain" className="text-primary font-medium flex items-center justify-center hover:underline">
                 Learn More <ArrowRight className="h-4 w-4 ml-1" />
               </Link>
-            </AnimatedSection>
+            </AnimatedSection> */}
           </div>
+          
           
           <div className="mt-16 text-center">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
@@ -260,8 +367,225 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Products Overview */}
+      <section className="py-20 bg-gray-50 scroll-mt-24" id="products">
+        <div className="container mx-auto px-4">
+          <AnimatedSection>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Our Latest Products</h2>
+            <div className="w-20 h-1 bg-primary mx-auto mb-8"></div>
+            <p className="text-center text-gray-600 max-w-2xl mx-auto mb-16">
+              Innovative solutions designed to solve real-world problems and enhance business operations.
+            </p>
+          </AnimatedSection>
+
+          {/* Okkhore Edu */}
+          <div className="container mx-auto px-4 py-5 mb-5">
+            <AnimatedSection>
+              <div className="flex items-center mb-8">
+                <Book className="h-8 w-8 text-primary mr-4" />
+                <h2 className="text-3xl md:text-4xl font-bold">Okkhore Edu</h2>
+              </div>
+              <div className="w-20 h-1 bg-primary mb-8"></div>
+            </AnimatedSection>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <AnimatedSection delay={0.2}>
+                <div className="rounded-lg shadow-xl overflow-hidden">
+                  {/* Placeholder for product screenshot */}
+                  <div className="bg-gray-200 h-[350px] flex items-center justify-center">
+                    <div className="text-center">
+                      <Brain className="h-16 w-16 text-primary mx-auto mb-4" />
+                      <h3 className="text-xl font-medium">Okkhore Edu Dashboard</h3>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              <AnimatedSection delay={0.4}>
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold mb-4">Educational Platform for Modern Learning</h3>
+                  <p className="text-gray-600 mb-8">
+                    Okkhore Edu is a comprehensive learning management system designed to streamline education
+                    delivery with advanced AI-powered features, interactive content, and analytics.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Personalized Learning Paths</h4>
+                        <p className="text-gray-600">AI-driven custom learning journeys tailored to each student's needs and pace.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Interactive Content Library</h4>
+                        <p className="text-gray-600">Rich multimedia content with quizzes, assignments, and collaborative tools.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Advanced Analytics</h4>
+                        <p className="text-gray-600">In-depth insights into student performance and engagement with actionable recommendations.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Multi-platform Support</h4>
+                        <p className="text-gray-600">Accessible on web, mobile, and tablet devices for learning anytime, anywhere.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-6 flex flex-wrap gap-4">
+                    <Button asChild className="bg-primary hover:bg-primary/90">
+                      <a href="#" target="_blank" rel="noopener noreferrer">
+                        Request Demo
+                      </a>
+                    </Button>
+                    <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
+                      <a href="#" target="_blank" rel="noopener noreferrer">
+                        Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </AnimatedSection>
+            </div>
+          </div>
+
+          {/* Trust ISP */}
+          <div className="container mx-auto px-4 py-5 mt-5">
+            <AnimatedSection>
+              <div className="flex items-center mb-8">
+                <Database className="h-8 w-8 text-primary mr-4" />
+                <h2 className="text-3xl md:text-4xl font-bold">Trust ISP</h2>
+              </div>
+              <div className="w-20 h-1 bg-primary mb-8"></div>
+            </AnimatedSection>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <AnimatedSection delay={0.2} className="order-2 md:order-1">
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold mb-4">Complete ISP Management Solution</h3>
+                  <p className="text-gray-600 mb-8">
+                    Trust ISP is an all-in-one platform for Internet Service Providers to manage their operations,
+                    from customer billing to network monitoring, with an intuitive dashboard and powerful tools.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Automated Billing System</h4>
+                        <p className="text-gray-600">Streamlined invoicing, payment tracking, and subscription management.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Network Monitoring</h4>
+                        <p className="text-gray-600">Real-time monitoring of network performance with alerts for potential issues.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Customer Support Portal</h4>
+                        <p className="text-gray-600">Ticket management system with customer self-service options.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-medium">Comprehensive Reporting</h4>
+                        <p className="text-gray-600">Detailed analytics and reports for business intelligence and decision making.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-6 flex flex-wrap gap-4">
+                    <Button asChild className="bg-primary hover:bg-primary/90">
+                      <a href="#" target="_blank" rel="noopener noreferrer">
+                        Try Now
+                      </a>
+                    </Button>
+                    <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
+                      <a href="#" target="_blank" rel="noopener noreferrer">
+                        View Features <ArrowRight className="ml-2 h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              <AnimatedSection delay={0.4} className="order-1 md:order-2">
+                <div className="rounded-lg shadow-xl overflow-hidden">
+                  {/* Placeholder for product dashboard */}
+                  <div className="bg-gray-200 h-[350px] flex items-center justify-center">
+                    <div className="text-center">
+                      <Code className="h-16 w-16 text-primary mx-auto mb-4" />
+                      <h3 className="text-xl font-medium">Trust ISP Dashboard</h3>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
+            </div>
+          </div>
+          
+          <div className="mt-16 text-center">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+              <Link to="/products">
+                View All Products
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
-      <section className="py-20 bg-primary text-white">
+      <section className="py-20 bg-primary text-white scroll-mt-48" id="quote">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <AnimatedSection>
@@ -286,8 +610,19 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-20 bg-grey text-primary scroll-mt-24" id="testimonials">
+        <div className="container mx-auto px-4">
+          <AnimatedSection>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Client Testimonials</h2>
+            <div className="w-20 h-1 bg-primary mx-auto mb-8"></div>
+          </AnimatedSection>
+          <TestimonialSliderWithRadix />
+        </div>
+      </section>
+
       {/* Contact Form Section */}
-      <section className="py-20">
+      <section className="py-20 scroll-mt-24" id="contact">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <AnimatedSection>

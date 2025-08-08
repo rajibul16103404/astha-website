@@ -133,15 +133,20 @@ const Contact = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <AnimatedSection>
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className="bg-white shadow-lg rounded-lg overflow-hidden p-2">
               <h2 className="text-2xl font-bold p-6 border-b">Our Location</h2>
               <div className="h-96 w-full bg-gray-200 flex items-center justify-center">
-                {/* Replace with actual map if needed */}
-                <div className="text-center">
-                  <MapPin className="h-16 w-16 text-primary mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold">Rajshahi, Bangladesh</h3>
-                  <p className="text-gray-600">Map loading...</p>
-                </div>
+                <iframe
+                  title="Google Map"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3633.9552136902057!2d88.61580227591116!3d24.38286136420117!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39fbef0027b3d8c1%3A0x630f6a940b4b9a2c!2sAstha%20Insight!5e0!3m2!1sen!2sbd!4v1754586952163!5m2!1sen!2sbd" 
+                  width="100%"
+                  height="100%"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-full border-0"
+                  >
+                  </iframe>
               </div>
             </div>
           </AnimatedSection>
