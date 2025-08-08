@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
-       public function index()
+    public function index()
     {
-        $services = Service::all();
+        $services = Service::with('details')->get();
         return response()->json($services);
     }
-    public function create()
+
+
+    public function create(Request $request)
     {
         $request->validate([
             'service_name' => 'required|string|max:255',

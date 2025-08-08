@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\ServiceDetail;
+use App\Models\ServiceDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ServiceDetailsController extends Controller
 {
-        public function index()
+    public function index()
     {
-        $details = ServiceDetail::with('service')->get();
+        $details = ServiceDetails::with('service')->get();
         return response()->json($details);
     }
 
@@ -117,7 +117,7 @@ class ServiceDetailsController extends Controller
         $detail->delete();
         return response()->json([
             'message' => 'Service detail deleted successfully'
-        ]);
-    }
+        ]);
+    }
 }
 
