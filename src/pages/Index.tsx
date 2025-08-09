@@ -16,7 +16,7 @@ import axios from 'axios';
 const Index = () => {
 
   const [service, setService] = useState([]);
-  const [service2, setService2] = useState([]);
+  const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -98,9 +98,9 @@ const Index = () => {
         const response = await axios.get(`${API_URL}/homepage`);
         const data = response.data;
         setService(data.service || []);
-        setService2(data.service2 || []);
+        setProduct(data.product || []);
       } catch (error) {
-        console.error('Error fetching services:', error);
+        console.error('Error fetching services/products:', error);
       } finally {
         setLoading(false);
       }
@@ -379,11 +379,12 @@ const Index = () => {
           </AnimatedSection>
 
           {/* Okkhore Edu */}
+          {product.map(p => (
           <div className="container mx-auto px-4 py-5 mb-5">
             <AnimatedSection>
               <div className="flex items-center mb-8">
-                <Book className="h-8 w-8 text-primary mr-4" />
-                <h2 className="text-3xl md:text-4xl font-bold">Okkhore Edu</h2>
+                <img className="h-8 w-8 text-primary mr-4" src={`${IMAGE_URL}/${p.product_icon}`}/>
+                <h2 className="text-3xl md:text-4xl font-bold">{p.product_name}</h2>
               </div>
               <div className="w-20 h-1 bg-primary mb-8"></div>
             </AnimatedSection>
@@ -403,60 +404,25 @@ const Index = () => {
 
               <AnimatedSection delay={0.4}>
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-bold mb-4">Educational Platform for Modern Learning</h3>
+                  <h3 className="text-2xl font-bold mb-4">{p.product_heading}</h3>
                   <p className="text-gray-600 mb-8">
-                    Okkhore Edu is a comprehensive learning management system designed to streamline education
-                    delivery with advanced AI-powered features, interactive content, and analytics.
+                    {p.product_details}
                   </p>
                   
                   <div className="space-y-4">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
+                    {p.features?.map((f) => (
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Check className="w-4 h-4 text-primary" />
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <h4 className="font-medium">{f.product_feature_name}</h4>
+                          <p className="text-gray-600">{f.product_feature_details}</p>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Personalized Learning Paths</h4>
-                        <p className="text-gray-600">AI-driven custom learning journeys tailored to each student's needs and pace.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Interactive Content Library</h4>
-                        <p className="text-gray-600">Rich multimedia content with quizzes, assignments, and collaborative tools.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Advanced Analytics</h4>
-                        <p className="text-gray-600">In-depth insights into student performance and engagement with actionable recommendations.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Multi-platform Support</h4>
-                        <p className="text-gray-600">Accessible on web, mobile, and tablet devices for learning anytime, anywhere.</p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                   
                   <div className="pt-6 flex flex-wrap gap-4">
@@ -475,104 +441,7 @@ const Index = () => {
               </AnimatedSection>
             </div>
           </div>
-
-          {/* Trust ISP */}
-          <div className="container mx-auto px-4 py-5 mt-5">
-            <AnimatedSection>
-              <div className="flex items-center mb-8">
-                <Database className="h-8 w-8 text-primary mr-4" />
-                <h2 className="text-3xl md:text-4xl font-bold">Trust ISP</h2>
-              </div>
-              <div className="w-20 h-1 bg-primary mb-8"></div>
-            </AnimatedSection>
-
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <AnimatedSection delay={0.2} className="order-2 md:order-1">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold mb-4">Complete ISP Management Solution</h3>
-                  <p className="text-gray-600 mb-8">
-                    Trust ISP is an all-in-one platform for Internet Service Providers to manage their operations,
-                    from customer billing to network monitoring, with an intuitive dashboard and powerful tools.
-                  </p>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Automated Billing System</h4>
-                        <p className="text-gray-600">Streamlined invoicing, payment tracking, and subscription management.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Network Monitoring</h4>
-                        <p className="text-gray-600">Real-time monitoring of network performance with alerts for potential issues.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Customer Support Portal</h4>
-                        <p className="text-gray-600">Ticket management system with customer self-service options.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium">Comprehensive Reporting</h4>
-                        <p className="text-gray-600">Detailed analytics and reports for business intelligence and decision making.</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-6 flex flex-wrap gap-4">
-                    <Button asChild className="bg-primary hover:bg-primary/90">
-                      <a href="#" target="_blank" rel="noopener noreferrer">
-                        Try Now
-                      </a>
-                    </Button>
-                    <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
-                      <a href="#" target="_blank" rel="noopener noreferrer">
-                        View Features <ArrowRight className="ml-2 h-4 w-4" />
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              </AnimatedSection>
-
-              <AnimatedSection delay={0.4} className="order-1 md:order-2">
-                <div className="rounded-lg shadow-xl overflow-hidden">
-                  {/* Placeholder for product dashboard */}
-                  <div className="bg-gray-200 h-[350px] flex items-center justify-center">
-                    <div className="text-center">
-                      <Code className="h-16 w-16 text-primary mx-auto mb-4" />
-                      <h3 className="text-xl font-medium">Trust ISP Dashboard</h3>
-                    </div>
-                  </div>
-                </div>
-              </AnimatedSection>
-            </div>
-          </div>
+          ))}
           
           <div className="mt-16 text-center">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90">

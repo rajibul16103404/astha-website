@@ -1,31 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
-const testimonials = [
-  {
-    quote:
-      "Astha Insight transformed our online presence with their creative strategies and deep understanding of digital trends. We saw a 50% increase in engagement!",
-    name: "Emily Carter",
-    title: "Marketing Director, TechNova",
-  },
-  {
-    quote:
-      "Their team’s expertise and dedication were evident from day one. We’re extremely satisfied with the results and the ongoing support we receive.",
-    name: "Michael Chen",
-    title: "Founder, GreenWave Solutions",
-  },
-  {
-    quote:
-      "Our project was completed ahead of schedule and exceeded expectations. I highly recommend Astha Insight for any tech needs!",
-    name: "Sara Mitchell",
-    title: "COO, BrightStart Education",
-  },
-];
 
 const TestimonialSlider = () => {
+
+  const [testimonial, setTestimonial] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const API_URL = import.meta.env.VITE_API_URL;
+  const IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
+
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const total = testimonials.length;
+  const total = testimonial.length;
 
   const slideWidthPercent = 65; // width of one slide in percent
   const slideGap = 16; // gap between slide and arrows (pixels)
@@ -37,6 +26,22 @@ const TestimonialSlider = () => {
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
   };
+
+      useEffect(() => {
+    const fetchTestimonial = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/homepage`);
+        const data = response.data;
+        setTestimonial(data.testimonial || []);
+      } catch (error) {
+        console.error('Error fetching Testimonials:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonial();
+  }, [API_URL]);
 
   return (
     <>
@@ -64,23 +69,27 @@ const TestimonialSlider = () => {
             transition: "transform 0.5s ease-in-out",
           }}
         >
-          {testimonials.map((testimonial, idx) => (
+          {testimonial.map((t) => (
             <div
-              key={idx}
+              key={t.id}
               className="flex-shrink-0 bg-white rounded-lg shadow-lg p-8 mx-auto"
               style={{ width: `${100 / total}%` }}
             >
               <Quote className="h-10 w-10 text-primary opacity-20 mb-4" />
-              <p className="text-gray-600 italic mb-6">“{testimonial.quote}”</p>
+              <p className="text-gray-600 italic mb-6">“{t.quote}”</p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
                   <span className="font-bold text-primary">
-                    {testimonial.name.charAt(0)}
+                    {t.author_image ? <img
+                        src={`${IMAGE_URL}${t.author_image}`}
+                        alt={t.author_name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      /> : t?.author_name?.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-semibold">{testimonial.name}</h4>
-                  <p className="text-gray-600 text-sm">{testimonial.title}</p>
+                  <h4 className="font-semibold">{t.author_name}</h4>
+                  <p className="text-gray-600 text-sm">{t.author_info}</p>
                 </div>
               </div>
             </div>
